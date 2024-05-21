@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Virtual Environments
+venv/
+
+# node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# npm cache directory
+.npm
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# MacOS
+.DS_Store
