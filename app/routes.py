@@ -40,7 +40,7 @@ def chat():
             gpt_response_json = json.loads(gpt_response)
         except json.JSONDecodeError as e:
             logger.error(f"JSON decoding error: {str(e)}")
-            return jsonify({"error": "Received invalid JSON from GPT-4."}), 500
+            return jsonify({"error": "Received invalid JSON from GPT-4 Turbo."}), 500
 
     except Exception as e:
         logger.error(f"Error in OpenAI API call: {str(e)}")
