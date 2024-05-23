@@ -22,32 +22,33 @@ openai.api_key = OPENAI_API_KEY
 def chat():
     user_message = request.json.get('message')
     if not user_message:
+        logger.error("No message provided")
         return jsonify({"error": "No message provided"}), 400
 
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that provides structured and formatted movie recommendations if asked for or else the exact movie details."},
-                {"role": "user", "content": f"Provide a structured list of the movies. Include the title, year, and a brief description for each movie. Format the response strictly as a JSON array with objects containing 'title', 'year', and 'description' keys, without any additional text."}
+                {"role": "system", "content": "You are a helpful assistant that provides structured and formatted movie recommendations."},
+                {"role": "user", "content": f"Provide a structured list of the best horror movies. Include the title, year, description, and a poster URL for each movie. Format the response as a JSON array with objects containing 'title', 'year', 'description', and 'poster' keys."}
             ]
         )
         gpt_response = response.choices[0].message['content'].strip()
         logger.info(f"Raw GPT-4 response: {gpt_response}")
-    
+        
         # Ensure the response is valid JSON
         try:
             gpt_response_json = json.loads(gpt_response)
         except json.JSONDecodeError as e:
             logger.error(f"JSON decoding error: {str(e)}")
-            return jsonify({"error": "Received invalid JSON from GPT-4 Turbo."}), 500
+            return jsonify({"error": "Received invalid JSON from GPT-4."}), 500
 
     except Exception as e:
         logger.error(f"Error in OpenAI API call: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
     logger.info(f"GPT-4-turbo response: {gpt_response}")
-    return jsonify(gpt_response_json)
+    return jsonify({"movies": gpt_response_json})
 
 
 @main.route('/movies', methods=['GET'])

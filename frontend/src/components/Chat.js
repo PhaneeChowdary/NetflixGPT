@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import "./Chat.css";
 
@@ -7,38 +7,16 @@ function Chat() {
     const [response, setResponse] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const [loadingMessage, setLoadingMessage] = useState(
-        "Thinking of the best movies..."
-    );
-
-    useEffect(() => {
-        let messageTimer;
-        if (loading) {
-            messageTimer = setTimeout(() => {
-                setLoadingMessage("Fetching some great recommendations...");
-            }, 3000);
-
-            const secondMessageTimer = setTimeout(() => {
-                setLoadingMessage("Almost there, stay tuned...");
-            }, 6000);
-
-            return () => {
-                clearTimeout(messageTimer);
-                clearTimeout(secondMessageTimer);
-            };
-        }
-    }, [loading]);
 
     const handleSend = async () => {
         setLoading(true);
-        setLoadingMessage("Thinking of the best movies...");
         try {
             console.log("Sending message:", message); // Debugging line
             const res = await axios.post("http://127.0.0.1:5000/chat", {
                 message,
             });
             console.log("Received response:", res.data); // Debugging line
-            setResponse(res.data);
+            setResponse(res.data.movies || []); // Ensure response is an array
             setError("");
         } catch (error) {
             console.error("Error sending message:", error);
@@ -60,6 +38,13 @@ function Chat() {
                             {movie.title} ({movie.year})
                         </h4>
                         <p>{movie.description}</p>
+                        {movie.poster && (
+                            <img
+                                src={movie.poster}
+                                alt={movie.title}
+                                style={{ width: "100px", height: "150px" }}
+                            />
+                        )}
                     </div>
                 ))}
             </div>
@@ -78,12 +63,7 @@ function Chat() {
             <button onClick={handleSend} disabled={loading}>
                 Send
             </button>
-            {loading && (
-                <div>
-                    <div className="spinner"></div>
-                    <p>{loadingMessage}</p>
-                </div>
-            )}
+            {loading && <div className="spinner"></div>}
             {error && <p className="error">{error}</p>}
             {response.length > 0 && renderResponse()}
         </div>
